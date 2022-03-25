@@ -5,12 +5,17 @@
 package WebAppLibreria.Api.Servicios;
 
 import WebAppLibreria.Api.Dtos.AutorDto;
+import WebAppLibreria.Api.Dtos.AutorRespuestaPaginacion;
 import WebAppLibreria.Api.Entidades.Autor;
 import WebAppLibreria.Api.Excepciones.ResourceNotFoundException;
 import WebAppLibreria.Api.Repositorios.AutorRepositorio;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 /**
@@ -49,11 +54,29 @@ public class AutorServicioImpl implements AutorServicio{
     }
 
     @Override
-    public List<AutorDto> obtenerTodosLosAutores() {
-        List<Autor> autores=autorRepositorio.findAll();
+    public AutorRespuestaPaginacion obtenerTodosLosAutores(int numeroDePagina,int medidaDePagina,String ordenarPor,String sortDir) {
+        //Ordena con SORT de Spring con if ternario
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(ordenarPor).ascending()
+				: Sort.by(ordenarPor).descending();
+        //utiliza clase de spring para paginacion y parametros numeroDePagina y medidaDePagina
+        Pageable pageable = PageRequest.of(numeroDePagina, medidaDePagina, sort);
+        Page<Autor> autores=autorRepositorio.findAll(pageable);
+         
         //Utiliza stream() para pasarlo a stream y poder mapear a autordto en el flujo
         //Despues lo tramsforma a una lista de AutorDto y la retorna
-        return autores.stream().map(t -> mapearAutorDto(t)).collect(Collectors.toList());
+        List<AutorDto> contenido= autores.stream().map(t -> mapearAutorDto(t)).collect(Collectors.toList());
+        
+        AutorRespuestaPaginacion autoresRespuesta= new AutorRespuestaPaginacion();
+        
+        
+        autoresRespuesta.setContenido(contenido);
+        autoresRespuesta.setNumeroPagina(autores.getNumber());
+        autoresRespuesta.setMedidaPagina(autores.getSize());
+        autoresRespuesta.setTotalElementos(autores.getTotalElements());
+        autoresRespuesta.setTotalPaginas(autores.getTotalPages());
+        autoresRespuesta.setUltima(autores.isLast());
+
+        return autoresRespuesta;
     }
 
     @Override

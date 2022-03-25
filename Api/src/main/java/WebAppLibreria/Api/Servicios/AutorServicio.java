@@ -5,7 +5,7 @@
 package WebAppLibreria.Api.Servicios;
 
 import WebAppLibreria.Api.Dtos.AutorDto;
-import java.util.List;
+import WebAppLibreria.Api.Dtos.AutorRespuestaPaginacion;
 
 /**
  *
@@ -14,7 +14,7 @@ import java.util.List;
 public interface AutorServicio {
     
     public AutorDto crearAutor(AutorDto autorDto);
-    public List<AutorDto> obtenerTodosLosAutores();
+    public AutorRespuestaPaginacion obtenerTodosLosAutores(int numeroDePagina,int medidaDePagina,String ordenarPor,String sortDir);
     public AutorDto buscarPorId(String id);
     public AutorDto actualizarAutor(AutorDto autorDto, String id);
 }

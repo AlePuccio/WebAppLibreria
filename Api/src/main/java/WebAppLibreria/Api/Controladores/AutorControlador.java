@@ -5,8 +5,8 @@
 package WebAppLibreria.Api.Controladores;
 
 import WebAppLibreria.Api.Dtos.AutorDto;
+import WebAppLibreria.Api.Dtos.AutorRespuestaPaginacion;
 import WebAppLibreria.Api.Servicios.AutorServicio;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -33,8 +34,11 @@ public class AutorControlador {
         return new ResponseEntity<>(autorServivio.crearAutor(autorDto),HttpStatus.CREATED);
     }
     @GetMapping("/autores")
-    public List<AutorDto> listarAutores(){
-        return autorServivio.obtenerTodosLosAutores();
+    public AutorRespuestaPaginacion listarAutores(@RequestParam(value = "pageNo", defaultValue = "0", required = false) int numeroDePagina,
+            @RequestParam(value = "pageSize", defaultValue = "10", required = false) int medidaDePagina,
+            @RequestParam(value = "sortBy", defaultValue = "nombre", required = false) String ordenarPor,
+            @RequestParam(value = "sortDir", defaultValue = "asc", required = false) String sortDir) {
+        return autorServivio.obtenerTodosLosAutores(numeroDePagina, medidaDePagina, ordenarPor, sortDir);
     }
     
     @GetMapping("/{id}")
